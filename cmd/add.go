@@ -9,6 +9,7 @@ import (
 
 	"github.com/Planckbaka/todo-cli/internal/models"
 	"github.com/Planckbaka/todo-cli/internal/storage"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -28,8 +29,21 @@ var addCmd = &cobra.Command{
 		title := args[0]
 		// retrieved flag arguments
 		desc, _ := cmd.Flags().GetString("desc")
+		if desc == "" {
+			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请描述你的任务")).Show()
+			desc = result
+
+		}
 		priority, _ := cmd.Flags().GetString("priority")
+		if priority == "" {
+			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请描述你的任务的紧急度（low/midium/high)")).Show()
+			priority = result
+		}
 		due, _ := cmd.Flags().GetString("due")
+		if due == "" {
+			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请输入你的任务的deadline(YYYY-MM-DD)")).Show()
+			due = result
+		}
 		tagStr, _ := cmd.Flags().GetString("tag")
 
 		// 3️⃣ 处理 tag 字符串为切片
@@ -65,7 +79,7 @@ func init() {
 
 	//定义flag
 	addCmd.Flags().StringP("desc", "d", "", "任务描述（可选）")
-	addCmd.Flags().StringP("priority", "p", "low", "优先级，low|medium|high")
+	addCmd.Flags().StringP("priority", "p", "", "优先级，low|medium|high")
 	addCmd.Flags().String("due", "", "截止日期，格式 YYYY-MM-DD 或自然语言（若支持）")
 	addCmd.Flags().StringP("tag", "t", "", "逗号分隔的标签列表")
 }

@@ -33,6 +33,17 @@ func SaveTodoData(todo *models.Todo) error {
 
 func QueryTodoData() ([]models.Todo, error) {
 	var todos []models.Todo
-	dbConn.Model(&models.Todo{}).Find(&todos)
+	result := dbConn.Model(&models.Todo{}).Find(&todos)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return todos, nil
+}
+
+func DeleteTodoData(id string) error {
+	result := dbConn.Where("id = ?", id).Delete(&models.Todo{})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

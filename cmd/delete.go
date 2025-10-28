@@ -1,12 +1,13 @@
 /*
 Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
 */
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/Planckbaka/todo-cli/internal/storage"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -22,6 +23,13 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("delete called")
+		result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("请输入你需要删除的任务的id").Show()
+		err := storage.DeleteTodoData(result)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 	},
 }
 
