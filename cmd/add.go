@@ -36,7 +36,7 @@ var addCmd = &cobra.Command{
 		}
 		priority, _ := cmd.Flags().GetString("priority")
 		if priority == "" {
-			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请描述你的任务的紧急度（low/midium/high)")).Show()
+			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请描述你的任务的紧急度（low/medium/high)")).Show()
 			priority = result
 		}
 		due, _ := cmd.Flags().GetString("due")
@@ -44,7 +44,13 @@ var addCmd = &cobra.Command{
 			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请输入你的任务的deadline(YYYY-MM-DD)")).Show()
 			due = result
 		}
+
 		tagStr, _ := cmd.Flags().GetString("tag")
+		if tagStr == "" {
+			result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请输入你的任务的标签，使用逗号隔开")).Show()
+			tagStr = result
+		}
+		tagStr = strings.ReplaceAll(tagStr, "，", ",")
 
 		// 3️⃣ 处理 tag 字符串为切片
 		var tags []string

@@ -1,6 +1,3 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -13,18 +10,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// listCmd represents the list command
-var listCmd = &cobra.Command{
-	Use:   "list",
-	Short: "列出所有任务",
-	Long:  `列出所有任务，数据包括任务ID、任务Title、任务描述、任务优先度、任务截止日期、任务完成情况`,
+// queryCmd represents the query command
+var queryCmd = &cobra.Command{
+	Use:   "query",
+	Short: "根据任务名字查询任务",
+	Long:  `查询任务，输入关于任务的标题的字可进行模糊查询，得到最多5条可能的任务`,
 	Run: func(cmd *cobra.Command, args []string) {
-		todos, err := storage.GetAllTodoData()
+		result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("任务关键词")).Show()
+
+		todos, err := storage.QueryTodoData(result)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		tableData1 := pterm.TableData{
+		tableData := pterm.TableData{
 			{"ID", "Title", "Description", "Priority", "DueDate", "Completed"},
 		}
 		for _, t := range todos {
@@ -47,24 +46,27 @@ var listCmd = &cobra.Command{
 				}
 			}
 
-			tableData1 = append(tableData1, []string{
+			tableData = append(tableData, []string{
 				strconv.Itoa(int(t.ID)), t.Title, t.Description, strings.TrimSpace(priority), dueDate, strconv.FormatBool(t.Completed)})
 		}
 
-		pterm.DefaultTable.WithHasHeader().WithBoxed().WithData(tableData1).Render()
+		err = pterm.DefaultTable.WithHasHeader().WithBoxed().WithData(tableData).Render()
+		if err != nil {
+			return
+		}
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(queryCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// listCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// queryCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// queryCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

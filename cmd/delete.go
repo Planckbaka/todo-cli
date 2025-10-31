@@ -1,10 +1,9 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/Planckbaka/todo-cli/internal/storage"
 	"github.com/pterm/pterm"
@@ -14,22 +13,29 @@ import (
 // deleteCmd represents the delete command
 var deleteCmd = &cobra.Command{
 	Use:   "delete",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "删除任务",
+	Long: `根据你提供的任务ID进行任务的删除，
+若不知道任务ID多少可以通过list and query 指令来查询所要删除的任务ID`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("delete called")
 		result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText("请输入你需要删除的任务的id").Show()
-		err := storage.DeleteTodoData(result)
+		deletedlist, err := storage.DeleteTodoData(result)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
+		pterm.Success.Println("You delete the task successfully")
 
+		//make a table to show the deleted data
+		tableData := pterm.TableData{
+			{"ID", "Title", "Description", "Priority", "DueDate", "Completed"},
+		}
+		tableData = append(tableData, []string{strconv.Itoa(int(deletedlist.ID)), deletedlist.Title, deletedlist.Description, strings.TrimSpace(deletedlist.Priority), deletedlist.DueDate, strconv.FormatBool(deletedlist.Completed)})
+
+		//Show deleted data
+		err = pterm.DefaultTable.WithHasHeader().WithBoxed().WithData(tableData).Render()
+		if err != nil {
+			return
+		}
 	},
 }
 

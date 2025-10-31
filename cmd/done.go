@@ -1,27 +1,30 @@
-/*
-Copyright © 2025 NAME HERE <EMAIL ADDRESS>
-
-*/
 package cmd
 
 import (
 	"fmt"
 
+	"github.com/Planckbaka/todo-cli/internal/storage"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
 // doneCmd represents the done command
 var doneCmd = &cobra.Command{
 	Use:   "done",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "标记一条任务完成",
+	Long:  `标记完成一个已知的任务。必须提供任务ID。`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("done called")
+		result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(pterm.Bold.Sprint("请输入你已完成的任务ID")).Show()
+		err := storage.DoneTodoData(result)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		// Enable debug messages in PTerm.
+		pterm.EnableDebugMessages()
+		// Print a success message with PTerm.
+		pterm.Success.Println("task gets done successfully")
 	},
 }
 
