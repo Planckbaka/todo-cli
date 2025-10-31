@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"log"
+
 	"github.com/Planckbaka/todo-cli/internal/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -18,6 +20,43 @@ func InitDatabase() error {
 	err = db.AutoMigrate(&models.Todo{})
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+// close database function
+//func CloseDatabaseElegantly(ctx context.Context) error {
+//	if dbConn == nil {
+//		return nil
+//	}
+//
+//	sqlDB, err := dbConn.DB()
+//	if err != nil {
+//		return err
+//	}
+//
+//	done := make(chan error, 1)
+//	go func() {
+//		done <- sqlDB.Close()
+//	}()
+//
+//	select {
+//	case <-ctx.Done():
+//		// 如果超时或被取消
+//		return ctx.Err()
+//	case err := <-done:
+//		return err
+//	}
+//}
+
+func CloseDatabase() error {
+	if dbConn != nil {
+		sqlDB, err := dbConn.DB()
+		if err != nil {
+			return err
+		}
+		log.Print("Close database successfully")
+		return sqlDB.Close()
 	}
 	return nil
 }
