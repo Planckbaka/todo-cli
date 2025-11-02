@@ -1,27 +1,41 @@
 package storage
 
 import (
+	"fmt"
 	"log"
 
+	"github.com/Planckbaka/todo-cli/internal/config"
+	"github.com/Planckbaka/todo-cli/internal/errors"
 	"github.com/Planckbaka/todo-cli/internal/models"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 var dbConn *gorm.DB
 
 func InitDatabase() error {
-	db, err := gorm.Open(sqlite.Open("./data/todos.db"), &gorm.Config{})
+	configs := config.Load()
+
+	db, err := gorm.Open(sqlite.Open(configs.DatabasePath), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 	if err != nil {
-		panic("failed to connect database")
+		return fmt.Errorf("%w: %v", errors.ErrDatabaseConnection, err)
 	}
-	dbConn = db
-	// Migrate the schema
-	err = db.AutoMigrate(&models.Todo{})
+
+	// set connection pool
+	sqlDB, err := db.DB()
 	if err != nil {
 		return err
 	}
-	return nil
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(100)
+
+	dbConn = db
+
+	// Migrate the schema
+	return db.AutoMigrate(&models.Todo{})
 }
 
 // close database function
@@ -72,7 +86,7 @@ func SaveTodoData(todo *models.Todo) error {
 
 func GetAllTodoData() ([]models.Todo, error) {
 	var todos []models.Todo
-	result := dbConn.Model(&models.Todo{}).Find(&todos)
+	result := dbConn.Model(&models.Todo{}).Order("priority asc").Find(&todos)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -101,11 +115,13 @@ func DoneTodoData(id string) error {
 
 // QueryTodoData find data by keywords
 func QueryTodoData(title string) ([]models.Todo, error) {
+	configs := config.Load()
+
 	var todos []models.Todo
 	result := dbConn.Model(&models.Todo{}).
 		Where("title LIKE ?", "%"+title+"%").
 		Find(&todos).
-		Limit(5)
+		Limit(configs.MaxQueryResults)
 	if result.Error != nil {
 		return nil, result.Error
 	}

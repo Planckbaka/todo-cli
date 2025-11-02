@@ -8,14 +8,20 @@ import (
 	"log"
 
 	"github.com/Planckbaka/todo-cli/cmd"
+	"github.com/Planckbaka/todo-cli/internal/config"
 	"github.com/Planckbaka/todo-cli/internal/storage"
 )
 
 func main() {
-	err := storage.InitDatabase()
-	if err != nil {
+
+	if err := config.InitConfig(); err != nil {
 		fmt.Println(err)
 	}
+
+	if err := storage.InitDatabase(); err != nil {
+		fmt.Println(err)
+	}
+
 	cmd.Execute()
 
 	//close database

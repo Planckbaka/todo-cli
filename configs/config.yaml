@@ -1,0 +1,4 @@
+database:
+    path: ./data/todos.db
+max:
+  queryResults: 5
