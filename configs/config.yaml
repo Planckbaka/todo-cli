@@ -1,4 +1,5 @@
 database:
     path: ./data/todos.db
+    dirPath: ./data
 max:
   queryResults: 5

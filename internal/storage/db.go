@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/Planckbaka/todo-cli/internal/config"
 	"github.com/Planckbaka/todo-cli/internal/errors"
@@ -16,6 +17,10 @@ var dbConn *gorm.DB
 
 func InitDatabase() error {
 	configs := config.Load()
+
+	if err := os.MkdirAll(configs.DatabasePathDir, 0755); err != nil {
+		return fmt.Errorf("could not create database directory: %w", err)
+	}
 
 	db, err := gorm.Open(sqlite.Open(configs.DatabasePath), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),

@@ -18,6 +18,7 @@ func InitConfig() error {
 
 	// default value
 	viper.SetDefault("database.path", "./data/todos.db")
+	viper.SetDefault("database.dirPath", "./data")
 	viper.SetDefault("max.queryResults", 5)
 	// read config
 	if err := viper.ReadInConfig(); err != nil {
@@ -54,6 +55,7 @@ func Load() *models.Config {
 	// 支持环境变量和配置文件
 	return &models.Config{
 		DatabasePath:    viper.GetString("database.path"),
+		DatabasePathDir: viper.GetString("database.dirPath"),
 		MaxQueryResults: 5,
 	}
 }

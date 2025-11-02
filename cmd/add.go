@@ -20,7 +20,7 @@ var addCmd = &cobra.Command{
 	Long: `创建一条新的任务。必须提供标题（位置参数或 --title）。
 可选字段：--desc, --priority (low|medium|high), --due YYYY-MM-DD, --tag tag1,tag2。
 成功后会输出新任务 ID。`,
-	Example: `todo add "写作业" --desc "写有机化学第四章和第五章作业" --due 2025-10-29 --tag homework`,
+	Example: `./todo-cli add "写作业" --desc "写有机化学第四章和第五章作业" --due 2025-10-29 --tag homework`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			fmt.Println("Error: 缺少任务标题，例如: todo add \"写作业\"")
